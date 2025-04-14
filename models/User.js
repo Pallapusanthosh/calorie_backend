@@ -12,6 +12,14 @@ const UserSchema = new mongoose.Schema({
   bmi: Number,
   profileFilled: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
+  sessionInfo: {
+    dailyCalories: Number,
+    macros: {
+      protein: Number,
+      carbs: Number,
+      fats: Number
+    }
+  }
 });
 
 export default mongoose.model('User', UserSchema);

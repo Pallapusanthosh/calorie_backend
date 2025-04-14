@@ -43,29 +43,87 @@ export const getDailyMeals = async (req, res) => {
   let totalCalories = 0;
 
   meals.forEach(meal => {
-    meal.items.forEach(item => {
-      const [name, cal] = item.split(' (');
-      const calories = parseInt(cal);
-      breakdown[meal.mealType]+=calories;
-      totalCalories += calories;
-    });
+    breakdown[meal.mealType] += meal.calories;
+    totalCalories += meal.calories;
   });
 
   res.send({ date: startOfDay.toISOString().split('T')[0], total: totalCalories, breakdown });
 };
 
 export const getMonthlyMeals = async (req, res) => {
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  // Get the current date
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  
+  // Calculate the start of the current month
+  const startOfMonth = new Date(currentYear, currentMonth, 1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  
+  // Calculate the end of the current month
+  const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+  endOfMonth.setHours(23, 59, 59, 999);
+  
+  // Get the number of days in the current month
+  const daysInMonth = endOfMonth.getDate();
 
-  const meals = await Meal.find({ userId: req.user._id, createdAt: { $gte: thirtyDaysAgo } });
-
-  const monthlyData = {};
-  meals.forEach(meal => {
-    const date = meal.createdAt.toISOString().split('T')[0];
-    if (!monthlyData[date]) monthlyData[date] = 0;
-    monthlyData[date] += meal.calories;
+  // Get all meals for the current month
+  const meals = await Meal.find({ 
+    userId: req.user._id, 
+    createdAt: { 
+      $gte: startOfMonth,
+      $lte: endOfMonth
+    } 
   });
 
-  res.send(Object.entries(monthlyData).map(([date, total]) => ({ date, total })));
+  // Initialize an object to store daily totals
+  const dailyTotals = {};
+
+  // Process each meal
+  meals.forEach(meal => {
+    const date = new Date(meal.createdAt);
+    const day = date.getDate();
+    const dayKey = day.toString();
+    
+    if (!dailyTotals[dayKey]) {
+      dailyTotals[dayKey] = {
+        day: day,
+        total: 0,
+        breakdown: { breakfast: 0, lunch: 0, dinner: 0, snacks: 0, other: 0 }
+      };
+    }
+    
+    dailyTotals[dayKey].total += meal.calories;
+    dailyTotals[dayKey].breakdown[meal.mealType] += meal.calories;
+  });
+
+  // Create an array with all days of the month (1 to daysInMonth)
+  const result = [];
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayKey = day.toString();
+    if (dailyTotals[dayKey]) {
+      // Day has data
+      result.push({
+        day: day,
+        total: dailyTotals[dayKey].total,
+        breakdown: dailyTotals[dayKey].breakdown
+      });
+    } else {
+      // Day has no data
+      result.push({
+        day: day,
+        total: 0,
+        breakdown: { breakfast: 0, lunch: 0, dinner: 0, snacks: 0, other: 0 }
+      });
+    }
+  }
+
+  // Add month and year information
+  const monthName = startOfMonth.toLocaleString('default', { month: 'long' });
+  
+  res.send({
+    month: monthName,
+    year: currentYear,
+    days: result
+  });
 };

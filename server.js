@@ -7,6 +7,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authroutes.js';
 import profileRoutes from './routes/profileroute.js';
 import mealRoutes from './routes/mealroutes.js';
+import calorieRoutes from './routes/calorieRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.use(morgan('dev'));
 app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
 app.use('/meals', mealRoutes);
+app.use('/calories', calorieRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

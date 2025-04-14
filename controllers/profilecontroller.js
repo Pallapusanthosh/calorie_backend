@@ -17,6 +17,18 @@ export const updateProfile = async (req, res) => {
   user.goal = updates.goal || user.goal;
   user.profileFilled = true;
 
+  // Update session info if provided
+  if (updates.sessionInfo) {
+    user.sessionInfo = {
+      dailyCalories: updates.sessionInfo.dailyCalories,
+      macros: {
+        protein: updates.sessionInfo.macros.protein,
+        carbs: updates.sessionInfo.macros.carbs,
+        fats: updates.sessionInfo.macros.fats
+      }
+    };
+  }
+
   // Recalculate BMI
   if (user.weight && user.height) {
     user.bmi = (user.weight / ((user.height / 100) ** 2)).toFixed(1);
