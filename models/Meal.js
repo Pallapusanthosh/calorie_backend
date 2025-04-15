@@ -7,6 +7,11 @@ const MealSchema = new mongoose.Schema({
   items: [String],
   imageUrl: String,
   createdAt: { type: Date, default: Date.now },
+  macros: {
+    protein: Number,
+    carbs: Number,
+    fats: Number
+  }
 });
 
 export default mongoose.model('Meal', MealSchema);

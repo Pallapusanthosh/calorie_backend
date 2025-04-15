@@ -74,7 +74,7 @@ def load_model():
         return None
 
 def process_image(image_path):
-    """Process the image with the YOLO model"""
+    """Process the image with the YOLO model and return only the highest confidence class"""
     try:
         # Check dependencies
         if not check_dependencies():
@@ -99,43 +99,39 @@ def process_image(image_path):
         print(f"Image size: {image.size}", file=sys.stderr)
         print(f"Image mode: {image.mode}", file=sys.stderr)
         
-        # Perform inference with verbose=False and save=False to suppress all output
+        # Perform inference
         print("Performing inference...", file=sys.stderr)
-        results = model(image_path, conf=0.1, verbose=False, save=True)
-        
-        # Process results
-        predictions = []
+        results = model(image_path, conf=0.1, verbose=False)
+
+        # Process results to get the prediction with the highest confidence
+        best_prediction = None
         for result in results:
             boxes = result.boxes
             for box in boxes:
-                # Get box coordinates
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
-                # Get confidence
                 conf = float(box.conf[0])
-                # Get class
-                cls = int(box.cls[0])
-                class_name = result.names[cls]
-                
-                # Add prediction to list
-                predictions.append({
-                    'name': class_name,
-                    'confidence': conf,
-                    'bbox': [float(x1), float(y1), float(x2), float(y2)],
-                    'calories': get_calories_for_food(class_name)
-                })
-        
-        print(f"Found {len(predictions)} food items", file=sys.stderr)
-        
-        # Ensure we're only printing the JSON to stdout
-        sys.stderr.flush()  # Flush any pending stderr output
-        sys.stdout.flush()  # Flush any pending stdout output
-        print(json.dumps(predictions), flush=True)  # Print JSON and flush stdout
-        
+                if best_prediction is None or conf > best_prediction['confidence']:
+                    x1, y1, x2, y2 = box.xyxy[0].tolist()
+                    cls = int(box.cls[0])
+                    class_name = result.names[cls]
+
+                    best_prediction = {
+                        'name': class_name,
+                        'confidence': conf,
+                        'bbox': [float(x1), float(y1), float(x2), float(y2)],
+                        'calories': get_calories_for_food(class_name)
+                    }
+
+        if best_prediction:
+            print("Found 1 best food item", file=sys.stderr)
+            print(json.dumps([best_prediction]), flush=True)  # Output as a list
+        else:
+            print("No food items found", file=sys.stderr)
+            print(json.dumps([]), flush=True)
+
     except Exception as e:
         print(f"Error processing image: {str(e)}", file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)
-
 def get_calories_for_food(food_name):
     """Get calories per 100g for a food item from the updated database"""
     import os, json
