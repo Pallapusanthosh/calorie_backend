@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 import Meal from "../models/Meal.js";
-import  callAIAgent  from "../services/aiAgentService.js";
+import  callAIAgent  from "../Services/aiAgentService.js";
 // const { callAIAgent } = require("../Services/aiAgentService.js");
 
 export const dailyAdvice = async (req, res) => {
