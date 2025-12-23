@@ -5,7 +5,7 @@ import { addMeal, getDailyMeals, getMonthlyMeals , deleteMeal } from '../control
 
 const router = express.Router();
 
-router.post('/', auth, upload.single('image'), addMeal);
+router.post('/',  upload.single('image'), addMeal);
 router.delete('/meals/:id', auth, deleteMeal);
 router.get('/daily', auth, getDailyMeals);
 router.get('/monthly', auth, getMonthlyMeals);

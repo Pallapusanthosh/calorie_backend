@@ -8,6 +8,7 @@ import authRoutes from './routes/authroutes.js';
 import profileRoutes from './routes/profileroute.js';
 import mealRoutes from './routes/mealroutes.js';
 import calorieRoutes from './routes/calorieRoutes.js';
+import agentRoutes from './routes/agentRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -23,6 +24,8 @@ app.use('/auth', authRoutes);
 app.use('/profile', profileRoutes);
 app.use('/meals', mealRoutes);
 app.use('/calories', calorieRoutes);
+app.use("/agent", agentRoutes);
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
