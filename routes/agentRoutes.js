@@ -10,9 +10,9 @@ import { mealRecommendation } from '../controllers/agentrecommendationcontroller
 const router = express.Router();
 
 
-router.post('/chat',  chatAgent);
-router.get('/daily-advice' , dailyAdvice);
-router.post('/recommendation', mealRecommendation);
+router.post('/chat',auth ,  chatAgent);
+router.get('/daily-advice' , auth , dailyAdvice);
+router.post('/recommendation',auth , mealRecommendation);
 
 
 export default router;
