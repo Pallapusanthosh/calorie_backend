@@ -21,6 +21,7 @@ export const deleteMeal = async (req, res) => {
 
 export const addMeal = async (req, res) => {
     const { mealType, weight } = req.body;
+     
     const yoloResults = await processImageWithYOLO(req.file.path);
     console.log("yolo123", yoloResults);
   
@@ -56,7 +57,7 @@ export const addMeal = async (req, res) => {
       carbs: sum.carbs + item.macros.carbs,
       fats: sum.fats + item.macros.fats
     }), { protein: 0, carbs: 0, fats: 0 });
-  
+   
     const meal = await Meal.create({
       userId: req.user._id,
       mealType,

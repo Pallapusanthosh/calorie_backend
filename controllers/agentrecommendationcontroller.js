@@ -9,7 +9,7 @@ export const mealRecommendation = async (req, res) => {
     const { mealDescription } = req.body;
 
     const user = await User.findById(userId);
-
+    
     const context = {
       goal: user.goal,
       weight_kg: user.weight,
@@ -18,7 +18,7 @@ export const mealRecommendation = async (req, res) => {
 
     const aiResponse = await callAIAgent("/agent/recommendation", {
       user_id: userId,
-      question: mealDescription,
+      question: `${mealDescription} Provide meal recommendations based on my recent meals and nutrition goals.`,
       context
     });
 

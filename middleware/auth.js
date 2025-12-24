@@ -9,7 +9,7 @@ const auth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({ googleId: decoded.googleId });
     if (!user) return res.status(401).send({ error: 'User not found' });
-
+   
     req.user = user;
     next();
   } catch (error) {
