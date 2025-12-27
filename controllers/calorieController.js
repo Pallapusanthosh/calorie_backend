@@ -36,15 +36,15 @@ export const calculateCalorieTarget = async (req, res) => {
       "weeklyAdjustment": string
     }`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log("text",text);
+    console.log("text", text);
     // Parse the JSON response
     const cleanedText = text.replace(/```json|```/g, '').trim();
     const calorieData = JSON.parse(cleanedText);
-    console.log('data',calorieData);
+    console.log('data', calorieData);
     res.json(calorieData);
   } catch (error) {
     console.error('Error calculating calorie target:', error);

@@ -7,7 +7,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const generateHealthReport = async (req, res) => {
   try {
-    const { name, age, gender, weight, height, bmi, goal, macros , monthlyData } = req.body;
+    const { name, age, gender, weight, height, bmi, goal, macros, monthlyData } = req.body;
     const prompt = `Generate a detailed personalized health report for the following user with the defined goal:
 - Name: ${name}
 - Age: ${age}
@@ -34,7 +34,7 @@ Please provide a JSON response with the following structure:
 } generate the  macronutrinettarget and dailycaloriestarget  for next month
  `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
